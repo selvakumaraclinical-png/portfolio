@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Selvakumar A — Clinical Data Management &amp; Clinical Research</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #142033;
+    --paper: #F4F3EE;
+    --paper-raised: #FFFFFF;
+    --teal: #2E6F63;
+    --teal-deep: #204E45;
+    --amber: #B9793B;
+    --line: #C7C9C0;
+    --line-soft: #DBDCD5;
+    --text: #1B2018;
+    --text-soft: #4B5049;
+    --text-faint: #7A7E75;
+    --shadow: rgba(20, 32, 51, 0.08);
+  }
+  :root:not([data-theme="light"]) {
+    @media (prefers-color-scheme: dark) {
+      --ink: #EDEBE3;
+      --paper: #12140F;
+      --paper-raised: #191B15;
+      --teal: #6FAE9E;
+      --teal-deep: #8FC3B4;
+      --amber: #D79A5F;
+      --line: #3A3D34;
+      --line-soft: #2A2C25;
+      --text: #EDEBE3;
+      --text-soft: #B7B8AE;
+      --text-faint: #82847A;
+      --shadow: rgba(0, 0, 0, 0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #EDEBE3;
+    --paper: #12140F;
+    --paper-raised: #191B15;
+    --teal: #6FAE9E;
+    --teal-deep: #8FC3B4;
+    --amber: #D79A5F;
+    --line: #3A3D34;
+    --line-soft: #2A2C25;
+    --text: #EDEBE3;
+    --text-soft: #B7B8AE;
+    --text-faint: #82847A;
+    --shadow: rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--text);
+    font-family: 'Source Serif 4', Georgia, serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4, .mono, nav, .field-label, .tag, .stat-label {
+    font-family: 'Space Grotesk', 'Segoe UI', Arial, sans-serif;
+  }
+  a { color: var(--teal-deep); }
+  ::selection { background: var(--teal); color: var(--paper-raised); }
+
+  .wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 28px;
+  }
+
+  /* ---- Nav ---- */
+  .topnav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: color-mix(in srgb, var(--paper) 92%, transparent);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .topnav .wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+  .topnav .id {
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 0.01em;
+  }
+  .topnav .id span { color: var(--teal-deep); }
+  .topnav .links {
+    display: flex;
+    gap: 18px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .topnav .links::-webkit-scrollbar { display: none; }
+  .topnav .links a {
+    color: var(--text-soft);
+    text-decoration: none;
+    font-size: 0.82rem;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    padding-bottom: 2px;
+  }
+  .topnav .links a:hover, .topnav .links a:focus-visible { color: var(--teal-deep); border-bottom-color: var(--teal); }
+
+  section { padding: 68px 0; border-bottom: 1px solid var(--line-soft); }
+  section:last-of-type { border-bottom: none; }
+
+  .kicker {
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    color: var(--text-faint);
+    margin: 0 0 8px;
+  }
+  h2.title {
+    font-size: 1.65rem;
+    margin: 0 0 28px;
+    font-weight: 600;
+    max-width: 26ch;
+  }
+
+  /* ---- Hero: CRF-style record header ---- */
+  .hero { padding-top: 46px; }
+  .crf {
+    border: 1px solid var(--line);
+    background: var(--paper-raised);
+    box-shadow: 0 1px 0 var(--shadow);
+    background-image:
+      linear-gradient(var(--line-soft) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+    background-size: 28px 28px;
+    background-position: -1px -1px;
+  }
+  .crf-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 14px 22px;
+    border-bottom: 1px solid var(--line);
+    font-size: 0.7rem;
+    color: var(--text-faint);
+    letter-spacing: 0.04em;
+  }
+  .crf-body { padding: 30px 22px 8px; }
+  .field-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.05em;
+    color: var(--teal-deep);
+    margin: 0 0 4px;
+  }
+  .crf-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(2.1rem, 6vw, 3.2rem);
+    font-weight: 700;
+    margin: 0 0 6px;
+    line-height: 1.05;
+  }
+  .crf-role {
+    font-size: 1.05rem;
+    color: var(--text-soft);
+    margin: 0 0 26px;
+  }
+  .crf-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px 24px;
+    padding: 20px 0 26px;
+    border-top: 1px dashed var(--line);
+  }
+  .crf-grid .val { font-size: 0.92rem; }
+  .crf-foot {
+    display: flex;
+    gap: 14px;
+    padding: 18px 22px;
+    border-top: 1px solid var(--line);
+    flex-wrap: wrap;
+  }
+  .btn {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.82rem;
+    text-decoration: none;
+    padding: 9px 16px;
+    border-radius: 3px;
+    border: 1px solid var(--ink);
+    color: var(--ink);
+  }
+  .btn.primary { background: var(--teal-deep); border-color: var(--teal-deep); color: var(--paper-raised); }
+  .btn:hover { opacity: 0.82; }
+
+  /* ---- About ---- */
+  .about-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 44px; }
+  .about-grid p { margin: 0 0 16px; color: var(--text-soft); }
+  .goal-box {
+    background: var(--paper-raised);
+    border-left: 3px solid var(--amber);
+    padding: 16px 18px;
+    font-size: 0.92rem;
+  }
+  .goal-box .field-label { color: var(--amber); }
+
+  /* ---- Journey timeline ---- */
+  .tl { position: relative; padding-left: 26px; }
+  .tl::before { content:""; position:absolute; left: 5px; top: 6px; bottom: 6px; width: 1px; background: var(--line); }
+  .tl-item { position: relative; padding-bottom: 34px; }
+  .tl-item:last-child { padding-bottom: 0; }
+  .tl-item::before {
+    content: "";
+    position: absolute;
+    left: -26px; top: 4px;
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 2px solid var(--teal-deep);
+  }
+  .tl-item.current::before { background: var(--teal-deep); }
+  .tl-date { font-size: 0.72rem; letter-spacing: 0.04em; color: var(--text-faint); margin-bottom: 4px; }
+  .tl-role { font-weight: 600; font-size: 1.05rem; margin: 0 0 2px; }
+  .tl-org { color: var(--teal-deep); font-size: 0.88rem; margin: 0 0 10px; }
+  .tl-tags { display: flex; flex-wrap: wrap; gap: 7px; }
+  .tag {
+    font-size: 0.72rem;
+    color: var(--text-soft);
+    border: 1px solid var(--line);
+    padding: 3px 9px;
+    border-radius: 3px;
+  }
+
+  /* ---- Skills ---- */
+  .skill-cols { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px 40px; }
+  .skill-group h3 {
+    font-size: 0.78rem;
+    letter-spacing: 0.03em;
+    color: var(--teal-deep);
+    margin: 0 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--line);
+  }
+  .skill-group ul { list-style: none; margin: 0; padding: 0; }
+  .skill-group li {
+    font-size: 0.92rem;
+    color: var(--text-soft);
+    padding: 6px 0;
+    border-bottom: 1px dotted var(--line-soft);
+  }
+  .skill-group li:last-child { border-bottom: none; }
+
+  /* ---- Projects ---- */
+  .project { margin-bottom: 50px; }
+  .project:last-child { margin-bottom: 0; }
+  .project-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .project-head h3 { font-size: 1.2rem; margin: 0; font-weight: 600; }
+  .project-org { font-size: 0.82rem; color: var(--text-faint); }
+  .project-focus { color: var(--text-soft); margin: 6px 0 20px; max-width: 60ch; }
+  .activities { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px 26px; }
+  .act {
+    border-top: 1px solid var(--line);
+    padding-top: 10px;
+  }
+  .act .act-num { font-size: 0.72rem; color: var(--text-faint); }
+  .act h4 { margin: 2px 0 4px; font-size: 0.95rem; font-weight: 600; }
+  .act p { margin: 0; font-size: 0.88rem; color: var(--text-soft); }
+  .skills-demo {
+    margin-top: 18px;
+    font-size: 0.82rem;
+    color: var(--text-faint);
+  }
+  .skills-demo b { color: var(--text-soft); font-weight: 500; }
+
+  .transfer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 22px;
+    font-size: 0.85rem;
+    color: var(--text-soft);
+  }
+  .transfer .arrow { color: var(--line); }
+  .transfer span.step {
+    border: 1px solid var(--line);
+    padding: 5px 10px;
+    border-radius: 3px;
+  }
+
+  /* ---- Workflow ---- */
+  .workflow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 44px;
+    align-items: start;
+  }
+  .wf-steps { list-style: none; margin: 0; padding: 0; counter-reset: wf; }
+  .wf-steps li {
+    counter-increment: wf;
+    position: relative;
+    padding: 10px 0 10px 34px;
+    border-bottom: 1px dotted var(--line-soft);
+    font-size: 0.95rem;
+  }
+  .wf-steps li::before {
+    content: counter(wf, decimal-leading-zero);
+    position: absolute;
+    left: 0; top: 9px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.78rem;
+    color: var(--teal-deep);
+  }
+  .wf-note {
+    font-size: 0.84rem;
+    color: var(--text-faint);
+    border-left: 3px solid var(--line);
+    padding: 4px 0 4px 14px;
+    margin-top: 18px;
+  }
+  .tool-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  /* ---- Compliance cards ---- */
+  .cards4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+  .card {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    padding: 20px;
+  }
+  .card h4 { margin: 0 0 4px; font-size: 1rem; font-family: 'Space Grotesk', sans-serif; }
+  .card p { margin: 0; font-size: 0.85rem; color: var(--text-soft); }
+  .compliance-note { margin-top: 22px; color: var(--text-soft); font-size: 0.92rem; max-width: 62ch; }
+
+  /* ---- Certifications & education ---- */
+  .cert-list { display: flex; flex-direction: column; }
+  .cert {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line-soft);
+    flex-wrap: wrap;
+  }
+  .cert:last-child { border-bottom: none; }
+  .cert-name { font-weight: 600; font-size: 0.98rem; }
+  .cert-org { font-size: 0.85rem; color: var(--text-soft); }
+  .cert-date { font-size: 0.8rem; color: var(--text-faint); white-space: nowrap; }
+
+  .edu {
+    display: flex;
+    gap: 20px;
+    align-items: baseline;
+    flex-wrap: wrap;
+  }
+  .edu .deg { font-size: 1.1rem; font-weight: 600; }
+  .edu .school { color: var(--teal-deep); font-size: 0.92rem; }
+  .edu .meta { color: var(--text-faint); font-size: 0.85rem; }
+
+  /* ---- Achievements ---- */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .stat { border-top: 2px solid var(--teal-deep); padding-top: 12px; }
+  .stat-num { font-family: 'Space Grotesk', sans-serif; font-size: 1.7rem; font-weight: 700; }
+  .stat-label { font-size: 0.76rem; color: var(--text-faint); margin-top: 4px; line-height: 1.4; }
+
+  /* ---- Contact ---- */
+  .contact-crf .crf-body { padding-bottom: 26px; }
+  .contact-line {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.1rem;
+    margin: 22px 0 0;
+    color: var(--teal-deep);
+  }
+
+  footer { padding: 30px 0 50px; text-align: center; color: var(--text-faint); font-size: 0.78rem; }
+
+  @media (max-width: 720px) {
+    .about-grid, .skill-cols, .activities, .workflow, .cards4, .stats { grid-template-columns: 1fr; }
+    .crf-grid { grid-template-columns: repeat(2, 1fr); }
+    .topnav .links { display: none; }
+  }
+  @media (max-width: 480px) {
+    .crf-grid { grid-template-columns: 1fr 1fr; }
+    .stats { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="wrap">
+    <div class="id">SELVAKUMAR A <span>· CDM/CR</span></div>
+    <div class="links">
+      <a href="#about">About</a>
+      <a href="#journey">Journey</a>
+      <a href="#skills">Skills</a>
+      <a href="#work">Work</a>
+      <a href="#workflow">Workflow</a>
+      <a href="#certs">Certifications</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero wrap">
+  <div class="crf">
+    <div class="crf-head">
+      <span>CASE RECORD — PROFESSIONAL SUMMARY</span>
+      <span>REV. SEP 2026</span>
+    </div>
+    <div class="crf-body">
+      <p class="field-label">Subject</p>
+      <h1 class="crf-name">Selvakumar A</h1>
+      <p class="crf-role">Clinical Data Management &middot; Clinical Data Associate &middot; Clinical Research</p>
+
+      <div class="crf-grid">
+        <div>
+          <p class="field-label">Background</p>
+          <p class="val">6+ years, clinical laboratory</p>
+        </div>
+        <div>
+          <p class="field-label">Current status</p>
+          <p class="val">Dual internship, CDM &amp; clinical research</p>
+        </div>
+        <div>
+          <p class="field-label">Location</p>
+          <p class="val">Dindigul, Tamil Nadu, India</p>
+        </div>
+      </div>
+    </div>
+    <div class="crf-foot">
+      <a class="btn primary" href="#work">View experience</a>
+      <a class="btn" href="mailto:selvakumar.a.clinical@gmail.com">Download resume</a>
+    </div>
+  </div>
+</header>
+
+<section id="about">
+  <div class="wrap">
+    <p class="kicker">ABOUT</p>
+    <h2 class="title">From laboratory data accuracy to clinical data management</h2>
+    <div class="about-grid">
+      <div>
+        <p>I'm a biochemistry graduate with more than six years of experience as a laboratory technician, where I built habits around data accuracy, documentation, and quality procedure that carry directly into clinical trial data work.</p>
+        <p>That interest in research led me into clinical research and clinical data management. Through hands-on clinical research work I've handled source data verification, REDCap data entry, investigator site file verification, protocol-compliance checks, and trial documentation. Alongside that, a clinical data management internship has built my practical exposure to eCRF review, discrepancy identification, data queries, data cleaning, and external laboratory data reconciliation.</p>
+        <p>I'm looking for a role where laboratory experience, clinical research exposure, and growing CDM skills can support accurate, reliable, high-quality trial data.</p>
+      </div>
+      <div class="goal-box">
+        <p class="field-label">Career goal</p>
+        <p style="margin:0; color: var(--text);">Grow as a clinical data management professional, with deeper expertise in trial data quality, data review, validation, and management.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="journey">
+  <div class="wrap">
+    <p class="kicker">PROFESSIONAL JOURNEY</p>
+    <h2 class="title">Three roles, one thread: trial data has to be right</h2>
+    <div class="tl">
+      <div class="tl-item">
+        <p class="tl-date">2020 — 2026</p>
+        <p class="tl-role">Laboratory Technician</p>
+        <p class="tl-org">SBC Speciality Lab, Dindigul</p>
+        <div class="tl-tags">
+          <span class="tag">Clinical biochemistry</span>
+          <span class="tag">Data accuracy</span>
+          <span class="tag">Quality procedures</span>
+          <span class="tag">Documentation</span>
+          <span class="tag">Physician coordination</span>
+        </div>
+      </div>
+      <div class="tl-item current">
+        <p class="tl-date">Sep 2026 — Present</p>
+        <p class="tl-role">Clinical Research Intern</p>
+        <p class="tl-org">Amrita Hospital, Kochi &middot; Ophthalmology</p>
+        <div class="tl-tags">
+          <span class="tag">SDV</span>
+          <span class="tag">REDCap</span>
+          <span class="tag">ISF verification</span>
+          <span class="tag">Clinical documentation</span>
+        </div>
+      </div>
+      <div class="tl-item current">
+        <p class="tl-date">Sep 2026 — Present</p>
+        <p class="tl-role">Clinical Data Management Intern</p>
+        <p class="tl-org">ISPTC &amp; Jal Veda HealthTech &middot; Remote</p>
+        <div class="tl-tags">
+          <span class="tag">eCRF review</span>
+          <span class="tag">Data queries</span>
+          <span class="tag">Data cleaning</span>
+          <span class="tag">Data reconciliation</span>
+          <span class="tag">DVS-based review</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="wrap">
+    <p class="kicker">CLINICAL DATA MANAGEMENT SKILLS</p>
+    <h2 class="title">What I bring to a trial data team</h2>
+    <div class="skill-cols">
+      <div class="skill-group">
+        <h3>Data management</h3>
+        <ul>
+          <li>eCRF review &amp; data entry</li>
+          <li>Electronic Data Capture (EDC)</li>
+          <li>REDCap</li>
+          <li>Data validation &amp; cleaning</li>
+          <li>Data reconciliation</li>
+          <li>Discrepancy identification</li>
+          <li>Clinical data query management</li>
+          <li>Data Validation Specifications (DVS)</li>
+        </ul>
+      </div>
+      <div class="skill-group">
+        <h3>Clinical research</h3>
+        <ul>
+          <li>Source Data Verification (SDV)</li>
+          <li>Investigator Site File (ISF) verification</li>
+          <li>Clinical trial documentation</li>
+          <li>Essential documents</li>
+          <li>Protocol compliance</li>
+          <li>Audit readiness</li>
+          <li>Patient data review</li>
+          <li>ICH-GCP</li>
+        </ul>
+      </div>
+      <div class="skill-group">
+        <h3>Technical</h3>
+        <ul>
+          <li>Microsoft Excel</li>
+          <li>Excel formulas &amp; functions</li>
+          <li>VLOOKUP</li>
+          <li>Pivot tables</li>
+          <li>LIMS</li>
+          <li>Biochemical data validation</li>
+        </ul>
+      </div>
+      <div class="skill-group">
+        <h3>Professional</h3>
+        <ul>
+          <li>Attention to detail</li>
+          <li>Documentation</li>
+          <li>Query follow-up</li>
+          <li>Cross-functional coordination</li>
+          <li>Investigator / physician communication</li>
+          <li>Team collaboration</li>
+          <li>Adaptability</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="work">
+  <div class="wrap">
+    <p class="kicker">PRACTICAL EXPOSURE</p>
+    <h2 class="title">Where the skills above actually got used</h2>
+
+    <div class="project">
+      <div class="project-head">
+        <h3>Clinical Data Management Internship</h3>
+        <span class="project-org">ISPTC &amp; Jal Veda HealthTech &middot; Remote</span>
+      </div>
+      <p class="project-focus">Clinical data review and quality management activities supporting accurate, consistent trial data.</p>
+      <div class="activities">
+        <div class="act"><p class="act-num">01</p><h4>eCRF review</h4><p>Reviewed electronic case report forms and identified discrepancies.</p></div>
+        <div class="act"><p class="act-num">02</p><h4>Data review</h4><p>Checked clinical data against study requirements and flagged inconsistencies.</p></div>
+        <div class="act"><p class="act-num">03</p><h4>Query management</h4><p>Tracked, issued, and supported resolution of data queries per DVS.</p></div>
+        <div class="act"><p class="act-num">04</p><h4>Data cleaning</h4><p>Assisted with cleaning to improve completeness and accuracy.</p></div>
+        <div class="act"><p class="act-num">05</p><h4>Data reconciliation</h4><p>Supported reconciling external lab data against trial parameters.</p></div>
+        <div class="act"><p class="act-num">06</p><h4>Documentation</h4><p>Maintained accurate records following CDM process.</p></div>
+      </div>
+      <p class="skills-demo"><b>Skills demonstrated:</b> eCRF review &middot; data validation &middot; query management &middot; data cleaning &middot; reconciliation &middot; documentation</p>
+    </div>
+
+    <div class="project">
+      <div class="project-head">
+        <h3>Clinical Research Internship — Ophthalmology</h3>
+        <span class="project-org">Amrita Hospital &middot; Kochi</span>
+      </div>
+      <p class="project-focus">Trial documentation, source-data review, and clinical research activity within the ophthalmology department.</p>
+      <div class="activities">
+        <div class="act"><h4>Source data verification</h4><p>Reviewed source records against study requirements and performed protocol checks.</p></div>
+        <div class="act"><h4>Patient data review</h4><p>Reviewed demographics, informed consent, lab results, and medical history.</p></div>
+        <div class="act"><h4>REDCap data entry</h4><p>Performed clinical data entry and supported eCRF activity.</p></div>
+        <div class="act"><h4>ISF verification</h4><p>Reviewed investigator site file documentation for completeness and audit readiness.</p></div>
+        <div class="act"><h4>Discrepancy identification</h4><p>Flagged missing or inconsistent information to the senior coordinator.</p></div>
+        <div class="act"><h4>Protocol activities</h4><p>Supported documentation and study-related data review.</p></div>
+      </div>
+      <p class="skills-demo">Trial data quality depends on accurate source documentation, careful review, and timely communication.</p>
+    </div>
+
+    <div class="project">
+      <div class="project-head">
+        <h3>Clinical Laboratory Data &amp; Quality</h3>
+        <span class="project-org">SBC Speciality Lab &middot; Dindigul</span>
+      </div>
+      <p class="project-focus">The laboratory foundation this career transition is built on.</p>
+      <div class="activities">
+        <div class="act"><h4>High-volume clinical data</h4><p>Processed and validated 100+ clinical biochemistry specimens daily.</p></div>
+        <div class="act"><h4>Data accuracy</h4><p>Performed two-tier verification of diagnostic reports.</p></div>
+        <div class="act"><h4>Quality procedures</h4><p>Validated results against laboratory SOPs.</p></div>
+        <div class="act"><h4>Quality control</h4><p>Calibrated and maintained automated analyzers to internal QC standards.</p></div>
+        <div class="act"><h4>Healthcare coordination</h4><p>Coordinated with physicians on results and follow-up.</p></div>
+        <div class="act"><h4>Documentation</h4><p>Maintained laboratory records supporting quality and safety.</p></div>
+      </div>
+      <div class="transfer">
+        <span class="step">Laboratory data accuracy</span>
+        <span class="arrow">&rarr;</span>
+        <span class="step">Attention to detail</span>
+        <span class="arrow">&rarr;</span>
+        <span class="step">Documentation &amp; quality</span>
+        <span class="arrow">&rarr;</span>
+        <span class="step">Clinical data review</span>
+        <span class="arrow">&rarr;</span>
+        <span class="step">Clinical data management</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="workflow">
+  <div class="wrap">
+    <p class="kicker">HOW I WORK</p>
+    <h2 class="title">A clinical data review cycle</h2>
+    <div class="workflow">
+      <ol class="wf-steps">
+        <li>Review</li>
+        <li>Identify discrepancy</li>
+        <li>Raise query</li>
+        <li>Follow up</li>
+        <li>Data cleaning</li>
+        <li>Reconciliation</li>
+        <li>Quality check</li>
+      </ol>
+      <div>
+        <p class="field-label">Tools &amp; concepts</p>
+        <div class="tool-tags">
+          <span class="tag">REDCap</span>
+          <span class="tag">eCRF</span>
+          <span class="tag">EDC</span>
+          <span class="tag">DVS</span>
+          <span class="tag">Data validation</span>
+          <span class="tag">Data cleaning</span>
+          <span class="tag">Data reconciliation</span>
+          <span class="tag">SDV</span>
+        </div>
+        <p class="wf-note">Activities above reflect intern-level exposure — assisting and supporting review under supervision, not independent ownership of trial data decisions.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="compliance">
+  <div class="wrap">
+    <p class="kicker">CLINICAL RESEARCH &amp; COMPLIANCE</p>
+    <h2 class="title">The regulatory backbone behind good trial data</h2>
+    <div class="cards4">
+      <div class="card"><h4>ICH-GCP</h4><p>Good Clinical Practice</p></div>
+      <div class="card"><h4>ISF</h4><p>Investigator Site File</p></div>
+      <div class="card"><h4>ICF</h4><p>Informed Consent Documentation</p></div>
+      <div class="card"><h4>Audit readiness</h4><p>Documentation &amp; compliance</p></div>
+    </div>
+    <p class="compliance-note">This exposure has shaped how I think about protocol compliance, accurate source documentation, essential documents, data review, and staying audit-ready.</p>
+  </div>
+</section>
+
+<section id="certs">
+  <div class="wrap">
+    <p class="kicker">CERTIFICATIONS</p>
+    <h2 class="title">Continued learning toward CDM</h2>
+    <div class="cert-list">
+      <div class="cert">
+        <div>
+          <p class="cert-name">Good Clinical Practice — ICH-GCP E6(R2)</p>
+          <p class="cert-org">NIDA Clinical Trials Network</p>
+        </div>
+        <p class="cert-date">June 2026</p>
+      </div>
+      <div class="cert">
+        <div>
+          <p class="cert-name">Introduction to Clinical Research</p>
+          <p class="cert-org">The Global Health Network &middot; Score: 94%</p>
+        </div>
+        <p class="cert-date"></p>
+      </div>
+      <div class="cert">
+        <div>
+          <p class="cert-name">Clinical Data Management Deep Dive: Basics to Advance</p>
+          <p class="cert-org">Udemy</p>
+        </div>
+        <p class="cert-date">August 2026</p>
+      </div>
+      <div class="cert">
+        <div>
+          <p class="cert-name">Excel: Introduction to Formulas and Functions</p>
+          <p class="cert-org">LinkedIn Learning</p>
+        </div>
+        <p class="cert-date"></p>
+      </div>
+    </div>
+
+    <div style="margin-top:40px;">
+      <p class="kicker">EDUCATION</p>
+      <div class="edu">
+        <span class="deg">B.Sc. Biochemistry</span>
+        <span class="school">Government Arts College, Paramakudi</span>
+        <span class="meta">June 2017 – May 2020 &middot; 7.335 CGPA, First Class</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="achievements">
+  <div class="wrap">
+    <p class="kicker">AT A GLANCE</p>
+    <div class="stats">
+      <div class="stat"><div class="stat-num">6+</div><div class="stat-label">Years in clinical laboratory work</div></div>
+      <div class="stat"><div class="stat-num">100+</div><div class="stat-label">Specimens processed &amp; validated daily</div></div>
+      <div class="stat"><div class="stat-num">CDM</div><div class="stat-label">Exposure to eCRF review, queries &amp; cleaning</div></div>
+      <div class="stat"><div class="stat-num">CR</div><div class="stat-label">Exposure to SDV, REDCap &amp; ISF verification</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap contact-crf">
+    <p class="kicker">CONTACT</p>
+    <div class="crf">
+      <div class="crf-head">
+        <span>CASE RECORD — CONTACT</span>
+        <span>STATUS: OPEN TO WORK</span>
+      </div>
+      <div class="crf-body">
+        <p class="field-label">Reach me</p>
+        <h2 style="font-family:'Space Grotesk',sans-serif; margin:0 0 18px; font-size:1.7rem;">Let's connect</h2>
+        <div class="crf-grid" style="border-top:none; padding-top:0;">
+          <div><p class="field-label">Email</p><p class="val"><a href="mailto:selvakumar.a.clinical@gmail.com">selvakumar.a.clinical@gmail.com</a></p></div>
+          <div><p class="field-label">Phone</p><p class="val">+91 6379035861</p></div>
+          <div><p class="field-label">Location</p><p class="val">Dindigul, Tamil Nadu, India</p></div>
+        </div>
+        <p class="contact-line">Building accurate data. Supporting quality clinical research.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>Selvakumar A &middot; Clinical Data Management &amp; Clinical Research &middot; Open to hybrid, on-site, and remote roles</footer>
+
+</body>
+</html>
